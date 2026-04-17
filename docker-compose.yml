@@ -1,0 +1,82 @@
+# MileHighSnatcher — Portainer / Synology deployment
+#
+# ── HOW TO DEPLOY ─────────────────────────────────────────────────────────────
+#
+# 1. SSH into your Synology and clone the repo:
+#      ssh admin@<nas-ip>
+#      mkdir -p /volume1/docker/milessnatcher
+#      cd /volume1/docker/milessnatcher
+#      git clone <your-repo-url> .
+#
+# 2. Build the image on the NAS:
+#      docker compose build
+#
+# 3. In Portainer → Stacks → Add Stack:
+#      - Choose "Upload" and select this file, OR
+#      - Choose "Git repository" and point it at your repo
+#      - Set the required environment variables in the Portainer UI
+#        (or paste the env block below into the "Environment variables" section)
+#
+# 4. Deploy the stack. Portainer will start the container as a daemon.
+#    It runs immediately on startup, then again at the times in MONITOR_RUN_TIMES.
+#
+# ── ENVIRONMENT VARIABLES ─────────────────────────────────────────────────────
+# Required:
+#   SEATS_AERO_API_KEY   Your seats.aero Pro API key
+#
+# Timing:
+#   TZ                   Container timezone (default: UTC). Controls when
+#                        MONITOR_RUN_TIMES fires. Use a tz database name,
+#                        e.g. America/New_York, America/Los_Angeles.
+#   MONITOR_RUN_TIMES    Comma-separated 24h times (default: 07:00,19:00)
+#
+# Email alerts (optional — leave SMTP_HOST blank to disable):
+#   SMTP_HOST            e.g. smtp.gmail.com
+#   SMTP_PORT            default 587
+#   SMTP_USER            sender address / login
+#   SMTP_PASSWORD        app password or SMTP password
+#   ALERT_EMAIL          recipient address (defaults to SMTP_USER if blank)
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+  jal-monitor:
+    build: .
+    image: milessnatcher:latest
+    container_name: milessnatcher
+    restart: unless-stopped
+
+    environment:
+      # ── Required ────────────────────────────────────────────────────────────
+      SEATS_AERO_API_KEY: ""          # ← paste your key here or set in Portainer UI
+
+      # ── Timing ──────────────────────────────────────────────────────────────
+      TZ: "America/New_York"          # ← set your local timezone
+      MONITOR_RUN_TIMES: "07:00,19:00"
+
+      # ── Always-on for Docker ────────────────────────────────────────────────
+      DISABLE_MACOS_NOTIFICATIONS: "true"
+      DATA_DIR: "/data"
+
+      # ── Email alerts (optional) ─────────────────────────────────────────────
+      SMTP_HOST: ""
+      SMTP_PORT: "587"
+      SMTP_USER: ""
+      SMTP_PASSWORD: ""
+      ALERT_EMAIL: ""
+
+    volumes:
+      # Persistent volume for seen_flights.json and rotating log files.
+      # Change the left side to a host path if you prefer bind mounts, e.g.:
+      #   /volume1/docker/milessnatcher/data:/data
+      - milessnatcher-data:/data
+
+    # Keep stdout/stderr logs accessible in Portainer's "Logs" tab.
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  milessnatcher-data:
+    driver: local

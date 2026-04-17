@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  LaunchAgent for MileHighSnatcher JAL First Class monitor.
+  Runs twice daily: 07:00 and 19:00 local time.
+
+  Install:
+    cp com.milessnatcher.jal-monitor.plist ~/Library/LaunchAgents/
+    launchctl load ~/Library/LaunchAgents/com.milessnatcher.jal-monitor.plist
+
+  The setup.sh script handles the path substitution and loading automatically.
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.milessnatcher.jal-monitor</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>PYTHON_PATH_PLACEHOLDER</string>
+        <string>SCRIPT_PATH_PLACEHOLDER</string>
+    </array>
+
+    <!-- Run at 07:00 and 19:00 -->
+    <key>StartCalendarInterval</key>
+    <array>
+        <dict>
+            <key>Hour</key>
+            <integer>7</integer>
+            <key>Minute</key>
+            <integer>0</integer>
+        </dict>
+        <dict>
+            <key>Hour</key>
+            <integer>19</integer>
+            <key>Minute</key>
+            <integer>0</integer>
+        </dict>
+    </array>
+
+    <!-- Run missed jobs on next opportunity (e.g. after sleep) -->
+    <key>RunAtLoad</key>
+    <false/>
+
+    <key>StandardOutPath</key>
+    <string>LOG_PATH_PLACEHOLDER</string>
+
+    <key>StandardErrorPath</key>
+    <string>LOG_PATH_PLACEHOLDER</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin</string>
+    </dict>
+</dict>
+</plist>
