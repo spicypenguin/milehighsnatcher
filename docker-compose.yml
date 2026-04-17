@@ -47,22 +47,22 @@ services:
 
     environment:
       # ── Required ────────────────────────────────────────────────────────────
-      SEATS_AERO_API_KEY: ""          # ← paste your key here or set in Portainer UI
+      SEATS_AERO_API_KEY: "${SEATS_AERO_API_KEY}"
 
       # ── Timing ──────────────────────────────────────────────────────────────
-      TZ: "America/New_York"          # ← set your local timezone
-      MONITOR_RUN_TIMES: "07:00,19:00"
+      TZ: "${TZ:-America/New_York}"
+      MONITOR_RUN_TIMES: "${MONITOR_RUN_TIMES:-07:00,19:00}"
 
       # ── Always-on for Docker ────────────────────────────────────────────────
       DISABLE_MACOS_NOTIFICATIONS: "true"
       DATA_DIR: "/data"
 
       # ── Email alerts (optional) ─────────────────────────────────────────────
-      SMTP_HOST: ""
-      SMTP_PORT: "587"
-      SMTP_USER: ""
-      SMTP_PASSWORD: ""
-      ALERT_EMAIL: ""
+      SMTP_HOST: "${SMTP_HOST:-}"
+      SMTP_PORT: "${SMTP_PORT:-587}"
+      SMTP_USER: "${SMTP_USER:-}"
+      SMTP_PASSWORD: "${SMTP_PASSWORD:-}"
+      ALERT_EMAIL: "${ALERT_EMAIL:-}"
 
     volumes:
       # Persistent volume for seen_flights.json and rotating log files.
