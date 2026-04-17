@@ -274,6 +274,31 @@ def notify_macos(title: str, message: str) -> None:
         log.warning("macOS notification failed: %s", exc)
 
 
+def notify_pushover(title: str, message: str) -> None:
+    token    = os.getenv("PUSHOVER_APP_TOKEN", "").strip()
+    user_key = os.getenv("PUSHOVER_USER_KEY", "").strip()
+    if not token or not user_key:
+        return  # not configured — silently skip
+
+    try:
+        resp = requests.post(
+            "https://api.pushover.net/1/messages.json",
+            data={
+                "token":    token,
+                "user":     user_key,
+                "title":    title,
+                "message":  message,
+                "priority": 1,      # high priority — bypasses quiet hours
+                "sound":    "cashregister",
+            },
+            timeout=10,
+        )
+        resp.raise_for_status()
+        log.info("Pushover notification sent.")
+    except Exception as exc:
+        log.error("Pushover notification failed: %s", exc)
+
+
 def notify_email(subject: str, body: str) -> None:
     host = os.getenv("SMTP_HOST", "").strip()
     if not host:
@@ -309,6 +334,7 @@ def send_alert(trips: list[dict], avail: dict) -> None:
     title, short, body = _build_alert_text(trips, avail)
     log.info("ALERT >>>  %s", short)
     notify_macos(title, short)
+    notify_pushover(title, short)
     notify_email(f"[MileHighSnatcher] {title}", body)
 
 # ── Main ───────────────────────────────────────────────────────────────────────

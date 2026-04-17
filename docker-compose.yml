@@ -57,6 +57,10 @@ services:
       DISABLE_MACOS_NOTIFICATIONS: "true"
       DATA_DIR: "/data"
 
+      # ── Pushover alerts (optional) ──────────────────────────────────────────
+      PUSHOVER_APP_TOKEN: "${PUSHOVER_APP_TOKEN:-}"
+      PUSHOVER_USER_KEY: "${PUSHOVER_USER_KEY:-}"
+
       # ── Email alerts (optional) ─────────────────────────────────────────────
       SMTP_HOST: "${SMTP_HOST:-}"
       SMTP_PORT: "${SMTP_PORT:-587}"
